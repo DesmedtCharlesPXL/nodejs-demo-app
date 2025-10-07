@@ -1,0 +1,30 @@
+name: Build Example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  
+
+      - name: Build project
+        run: |
+          echo "Maak het project: "
+          npm install
+          npm run build
+
+      - name: Run unit tests
+        run: |
+          echo "Running unit tests..."
+          npm test -- --json --outputFile=test-report.json
+          echo "Unit test report saved as test-report.json"
+
