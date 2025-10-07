@@ -9,9 +9,4 @@ coverage/
 tests/
 jest.config.js
 nodemon.json
-.git
-.gitignore
-README.md
-.dockerignore
-Dockerfile
 *.md
