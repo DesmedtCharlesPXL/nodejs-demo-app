@@ -1,0 +1,28 @@
+name: Production Deployment
+
+on:
+  workflow_dispatch:   # handmatig triggeren
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: SSH to Production Server and Deploy
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            echo "🚀 Starting production deployment..."
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull chakkebeest/user-management-api:latest
+            docker stop prod-app || true
+            docker rm prod-app || true
+            docker run -d -p 80:5000 --name prod-app chakkebeest/user-management-api:latest
+            docker image prune -f
+            echo "✅ Deployment completed successfully!"
