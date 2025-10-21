@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build-job:
+  complete-job:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +17,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  
+          node-version: '18' 
 
       - name: Install dependencies
         run: npm install
 
       - name: Build project
         run: npm run build
+
+      - name: Run tests
+        run: |
+          npm test -- --watch=false --browsers=ChromeHeadless
+          # Eventueel: voeg code coverage toe
+          npm run test -- --coverage
