@@ -1,0 +1,33 @@
+name: Test Deployment
+
+on:
+  workflow_dispatch:  # handmatig starten vanuit Actions-tab
+  push:
+    branches:
+      - main          
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Connect to EC2 and deploy latest version
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            echo "🔄 Pulling latest Docker image..."
+            docker pull chakkebeest/user-management-api:latest
+
+            echo "🧹 Stopping and removing old container..."
+            docker stop user-management-api || true
+            docker rm user-management-api || true
+
+            echo "🚀 Starting new container..."
+            docker run -d -p 5000:5000 --name user-management-api chakkebeest/user-management-api:latest
+
+            echo "✅ Deployment complete!"
